@@ -1,4 +1,4 @@
-import { useReducer, useMemo, createContext, ReactElement } from "react";
+import { useMemo, useReducer, createContext, ReactElement } from "react";
 
 export type CartItemType = {
   sku: string;
@@ -8,6 +8,7 @@ export type CartItemType = {
 };
 
 type CartStateType = { cart: CartItemType[] };
+
 const initCartState: CartStateType = { cart: [] };
 
 const REDUCER_ACTION_TYPE = {
@@ -33,6 +34,7 @@ const reducer = (
       if (!action.payload) {
         throw new Error("action.payload missing in ADD action");
       }
+
       const { sku, name, price } = action.payload;
 
       const filteredCart: CartItemType[] = state.cart.filter(
@@ -44,9 +46,9 @@ const reducer = (
       );
 
       const qty: number = itemExists ? itemExists.qty + 1 : 1;
+
       return { ...state, cart: [...filteredCart, { sku, name, price, qty }] };
     }
-
     case REDUCER_ACTION_TYPE.REMOVE: {
       if (!action.payload) {
         throw new Error("action.payload missing in REMOVE action");
@@ -55,7 +57,7 @@ const reducer = (
       const { sku } = action.payload;
 
       const filteredCart: CartItemType[] = state.cart.filter(
-        (item) => item.sku === sku
+        (item) => item.sku !== sku
       );
 
       return { ...state, cart: [...filteredCart] };
@@ -64,6 +66,7 @@ const reducer = (
       if (!action.payload) {
         throw new Error("action.payload missing in QUANTITY action");
       }
+
       const { sku, qty } = action.payload;
 
       const itemExists: CartItemType | undefined = state.cart.find(
@@ -85,9 +88,8 @@ const reducer = (
     case REDUCER_ACTION_TYPE.SUBMIT: {
       return { ...state, cart: [] };
     }
-
     default:
-      throw new Error("unidentified reducer action type");
+      throw new Error("Unidentified reducer action type");
   }
 };
 
@@ -104,7 +106,7 @@ const useCartContext = (initCartState: CartStateType) => {
 
   const totalPrice = new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "PGK",
+    currency: "USD",
   }).format(
     state.cart.reduce((previousValue, cartItem) => {
       return previousValue + cartItem.qty * cartItem.price;
@@ -114,7 +116,6 @@ const useCartContext = (initCartState: CartStateType) => {
   const cart = state.cart.sort((a, b) => {
     const itemA = Number(a.sku.slice(-4));
     const itemB = Number(b.sku.slice(-4));
-
     return itemA - itemB;
   });
 
@@ -131,12 +132,9 @@ const initCartContextState: UseCartContextType = {
   cart: [],
 };
 
-export const CartContext =
-  createContext<UseCartContextType>(initCartContextState);
+const CartContext = createContext<UseCartContextType>(initCartContextState);
 
-type ChildrenType = {
-  children?: ReactElement | ReactElement[];
-};
+type ChildrenType = { children?: ReactElement | ReactElement[] };
 
 export const CartProvider = ({ children }: ChildrenType): ReactElement => {
   return (

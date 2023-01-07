@@ -6,6 +6,7 @@ import { useState } from "react";
 
 function App() {
   const [viewCart, setViewCart] = useState<boolean>(false);
+
   const pageContent = viewCart ? <Cart /> : <ProductList />;
 
   const content = (
