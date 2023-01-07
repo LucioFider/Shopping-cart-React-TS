@@ -8,11 +8,15 @@ function App() {
   const [viewCart, setViewCart] = useState<boolean>(false);
   const pageContent = viewCart ? <Cart /> : <ProductList />;
 
-  return (
-    <div className="">
-      <h1>Shopping Cart React + TypeScript</h1>
-    </div>
+  const content = (
+    <>
+      <Header viewCart={viewCart} setViewCart={setViewCart} />
+      {pageContent}
+      <Footer viewCart={viewCart} />
+    </>
   );
+
+  return content;
 }
 
 export default App;
